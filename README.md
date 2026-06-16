@@ -4,4 +4,3 @@
 - Purpose for doing this is to understand deeply how an LLM function, by doing this i believe that i will also be able to grasp the concept of AI vulnerabilities much faster and understand them truely not just another script kiddie, an actual AI security reseacher.
 - And that's the whole point in this. 
 - wish me luck, let's see if i can pull this off.
-- stick around to find out if i pull this off or not.
