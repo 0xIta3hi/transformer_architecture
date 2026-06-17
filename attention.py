@@ -1,10 +1,23 @@
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
 
-def scaled_dot_product(Q,K,V,mask=None):
-    pass
+class selfAttention:
+    def __init__(self, d_model):
+        super().__init__()
+        self.d_model = d_model
 
-if __name__ == "__main__":
-    test_Q = torch.randn(1, 2, 3, 4) # Batch=1, Heads=2, Tokens=3, d_k=4
-    out, weights = scaled_dot_product(test_Q, test_Q, test_Q)
-    print("Output Shape:", out.shape)
+        self.w_q = nn.Linear(d_model,d_model, bias=False)
+        self.w_k = nn.Linear(d_model, d_model, bias=False)
+        self.w_v = nn.Linear(d_model,d_model,bias=False)
+
+    def forward(self, x, mask=None):
+        """
+        x shape: [batch_size, seq_len, d_model].
+        """
+        batch_size, seq_len, d_model = x.shape
+
+        Q = self.w_q(x)
+        K = self.w_k(x)
+        V = self.w_v(x)
+        
