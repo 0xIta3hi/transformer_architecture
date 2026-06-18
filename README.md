@@ -7,10 +7,10 @@
 
 ## What are my learning:
 ### Self-attention 
-- This is the way to predict next token in the output generation. 
+- This is the way to pass the context between tokens by calculating the relationship between them.
 - the input is divided into 3 things, namely query (q), key(k), and value (v)
 - the query is the part of the input which proposes a question like what am i looking for? eg, am i looking for a noun,verb,etc?
-- Key is the part which gives the context as in who am i? eg. i am a vovel.
+- Key asks the question : "what characteristics do i posses?" meaning instead of just context it is more of a label or tag. 
 - value is the actual meaning of token
 - to have the "attention" we first convert all these into a d_k dimensioned vector. Once done, we then firstly matrix multiply the Q and the transpose of K matrix.
 - once done, we then divide it with the root of d_k and apply softmax to get all the numbers in the range of 0 to 1
