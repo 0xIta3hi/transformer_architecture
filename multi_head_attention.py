@@ -43,7 +43,7 @@ class MultiHeadAttention:
     
 if __name__ == "__main__":
     # Standard Transformer config
-    mha = MultiHeadAttention(d_model=512, num_heads=8)
+    mha = MultiHeadAttention(d_k=512, d_head=8)
     sample_tokens = torch.randn(2, 5, 512) # B=2, T=5, d_model=512
     
     out, weights = mha(sample_tokens)
