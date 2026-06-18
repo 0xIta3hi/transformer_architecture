@@ -23,7 +23,7 @@ class MultiHeadAttention:
         
         self.W_o = nn.Linear(d_k, d_k, bias=False)
     
-def forward(self, x, mask=None):
+    def forward(self, x, mask=None):
         B, T, d_k_dim = x.shape  # x shape: [Batch, Tokens, d_k]
         
         # 1. Unified projection to total highway width
@@ -59,13 +59,13 @@ def forward(self, x, mask=None):
         return self.W_o(concat_output), attention_weights
     
 if __name__ == "__main__":
-    # Standard Transformer config
+    # Total dim = 512, Heads = 8 -> Means dimension per head (d_model) will be 64
     mha = MultiHeadAttention(d_k=512, d_head=8)
-    sample_tokens = torch.randn(2, 5, 512) # B=2, T=5, d_model=512
+    sample_tokens = torch.randn(2, 5, 512) # Shape: [Batch=2, Tokens=5, d_k=512]
     
     out, weights = mha(sample_tokens)
-    print("--- MULTI-HEAD ATTENTION COMPILED SUCCESSFULLY ---")
+    print("--- CUSTOM VARIABLE LAYOUT VERIFIED ---")
     print("Input Tensor Shape:      ", sample_tokens.shape)
     print("Final Output Shape:     ", out.shape)
-    print("Attention Weights Shape: ", weights.shape)  # Should be [2, 8, 5, 5]
+    print("Attention Weights Shape: ", weights.shape)  # Output: [2, 8, 5, 5]
         
