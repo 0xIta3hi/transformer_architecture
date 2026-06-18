@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-class MultiHeadAttention:
+class MultiHeadAttention(nn.Module):
     def __init__(self, d_k, d_head):
         """
         d_k: Total embedding dimension (e.g., 512)
@@ -22,7 +22,7 @@ class MultiHeadAttention:
         self.W_v = nn.Linear(d_k, d_k, bias=False)
         
         self.W_o = nn.Linear(d_k, d_k, bias=False)
-    
+
     def forward(self, x, mask=None):
         B, T, d_k_dim = x.shape  # x shape: [Batch, Tokens, d_k]
         
@@ -57,15 +57,13 @@ class MultiHeadAttention:
         
         # 5. Output mix layer
         return self.W_o(concat_output), attention_weights
-    
+
 if __name__ == "__main__":
     # Total dim = 512, Heads = 8 -> Means dimension per head (d_model) will be 64
     mha = MultiHeadAttention(d_k=512, d_head=8)
     sample_tokens = torch.randn(2, 5, 512) # Shape: [Batch=2, Tokens=5, d_k=512]
     
     out, weights = mha(sample_tokens)
-    print("--- CUSTOM VARIABLE LAYOUT VERIFIED ---")
     print("Input Tensor Shape:      ", sample_tokens.shape)
     print("Final Output Shape:     ", out.shape)
     print("Attention Weights Shape: ", weights.shape)  # Output: [2, 8, 5, 5]
-        
