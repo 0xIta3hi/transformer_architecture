@@ -23,32 +23,39 @@ class MultiHeadAttention:
         
         self.W_o = nn.Linear(d_k, d_k, bias=False)
     
-    def forward(self, x, mask=None):
-        B,T, d_k = x.shape
-
-        Q = self.w_q @ x
-        K = self.w_k @ x
-        V = self.w_v @ x
-
-        # now we split these
-        q = q.view(B, T, self.num_heads, self.d_k).permute(0, 2, 1, 3)
-        k = k.view(B, T, self.num_heads, self.d_k).permute(0, 2, 1, 3)
-        v = v.view(B, T, self.num_heads, self.d_k).permute(0, 2, 1, 3)
-
-        score = torch.matmul(q,k.transpose(-2,-1)) / (self.d_k ** 0.5)
-
+def forward(self, x, mask=None):
+        B, T, d_k_dim = x.shape  # x shape: [Batch, Tokens, d_k]
+        
+        # 1. Unified projection to total highway width
+        q = self.W_q(x)
+        k = self.W_k(x)
+        v = self.W_v(x)
+        
+        # 2. Slice into your new variable layout: [B, T, d_head, d_model] 
+        # Then permute to isolate heads: [B, d_head, T, d_model]
+        q = q.view(B, T, self.d_head, self.d_model).permute(0, 2, 1, 3)
+        k = k.view(B, T, self.d_head, self.d_model).permute(0, 2, 1, 3)
+        v = v.view(B, T, self.d_head, self.d_model).permute(0, 2, 1, 3)
+        
+        # 3. Calculate Scaled Dot-Product Attention
+        # Scaling factor uses your new per-head dimension variable (self.d_model)
+        scores = torch.matmul(q, k.transpose(-2, -1)) / (self.d_model ** 0.5)
+        
         if mask is not None:
             scores = scores.masked_fill(mask == 0, float("-inf"))
-
-        attention_weights = F.softmax(score, dim=-1)
-
-        output = attention_weights @ v
-
-        context = context.purmute(0,2,1,3).contiguous()
-
-        concat_output = context.view(B, T, self.d_model)
+            
+        attention_weights = F.softmax(scores, dim=-1)
         
-        # 5. Final linear projection mix
+        # Context matrix shape: [B, d_head, T, d_model]
+        context = torch.matmul(attention_weights, v)
+        
+        # 4. Merge the heads back into sequential layout: [B, T, d_head, d_model]
+        context = context.permute(0, 2, 1, 3).contiguous()
+        
+        # Collapse back into the total embedding width (self.d_k) -> [B, T, d_k]
+        concat_output = context.view(B, T, self.d_k)
+        
+        # 5. Output mix layer
         return self.W_o(concat_output), attention_weights
     
 if __name__ == "__main__":
