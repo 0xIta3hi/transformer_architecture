@@ -4,14 +4,24 @@ import torch.nn.functional as F
 
 class MultiHeadAttention:
     def __init__(self, d_k, d_head):
-        assert self.d_k % d_head == 0
-        self.d_k = d_k
-        self.d_head = d_head
-        self.d_model = d_k // d_head
-        self.w_q = nn.Linear(d_k,d_k,bias=False)
-        self.w_k = nn.Linear(d_k,d_k,bias=False)
-        self.w_v = nn.Linear(d_k,d_k,bias=False)
-        self.w_o = nn.Linear(d_k,d_k,bias=False) # final projection layer
+        """
+        d_k: Total embedding dimension (e.g., 512)
+        d_head: Number of attention heads (e.g., 8)
+        """
+        super().__init__()
+        # FIX: Assert directly on the incoming local arguments before binding them to self
+        assert d_k % d_head == 0, "Total dimension (d_k) must be perfectly divisible by number of heads (d_head)!"
+        
+        self.d_k = d_k              # Total dimension highway width
+        self.d_head = d_head        # Number of heads
+        self.d_model = d_k // d_head # Width per individual head slice
+        
+        # All linear layers operate on the total embedding width (d_k)
+        self.W_q = nn.Linear(d_k, d_k, bias=False)
+        self.W_k = nn.Linear(d_k, d_k, bias=False)
+        self.W_v = nn.Linear(d_k, d_k, bias=False)
+        
+        self.W_o = nn.Linear(d_k, d_k, bias=False)
     
     def forward(self, x, mask=None):
         B,T, d_k = x.shape
