@@ -41,4 +41,14 @@ class MultiHeadAttention:
         # 5. Final linear projection mix
         return self.W_o(concat_output), attention_weights
     
+if __name__ == "__main__":
+    # Standard Transformer config
+    mha = MultiHeadAttention(d_model=512, num_heads=8)
+    sample_tokens = torch.randn(2, 5, 512) # B=2, T=5, d_model=512
+    
+    out, weights = mha(sample_tokens)
+    print("--- MULTI-HEAD ATTENTION COMPILED SUCCESSFULLY ---")
+    print("Input Tensor Shape:      ", sample_tokens.shape)
+    print("Final Output Shape:     ", out.shape)
+    print("Attention Weights Shape: ", weights.shape)  # Should be [2, 8, 5, 5]
         
