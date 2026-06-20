@@ -35,6 +35,7 @@ class GCG:
         shift_logits = logits[..., :-1, :].contiguous()
         shift_labels = target_ids[..., 1:].contiguous()
         
+        
         # Compute loss
         loss = F.cross_entropy(
             shift_logits.view(-1, shift_logits.size(-1)),
